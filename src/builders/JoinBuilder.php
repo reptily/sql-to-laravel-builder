@@ -16,7 +16,7 @@ namespace RexShijaku\SQLToLaravelBuilder\builders;
 class JoinBuilder extends AbstractBuilder implements Builder
 {
 
-    public function build(array $parts, array &$skip_bag = array())
+    public function build(array $parts, array &$skipBag = array())
     {
         $qb = '';
 
@@ -24,8 +24,9 @@ class JoinBuilder extends AbstractBuilder implements Builder
 
             if ($this->getValue($join['type']) !== 'join') { // left,right,cross etc
                 $fn = $this->fnMerger(array(strtolower($join['type']), 'join'));
-            } else
+            } else {
                 $fn = $this->fnMerger(array('join'));
+            }
 
             $qb .= "->" . $fn . "(" . $this->buildRawable($join['table'], $join['table_is_raw']);
             if (isset($join['on_clause']) && count($join['on_clause']) > 0) // in cross join no on_clause!
@@ -36,36 +37,36 @@ class JoinBuilder extends AbstractBuilder implements Builder
                     && $join['on_clause'][0]['raw_field'] === false
                     && $join['on_clause'][0]['raw_value'] === false) {
 
-                    $on_clause = $join['on_clause'][0];
-                    $qb .= "," . $this->quote($on_clause['field'])
-                        . "," . $this->quote(implode(' ', $on_clause['operators']))
-                        . "," . $this->quote($on_clause['value']);
+                    $onClause = $join['on_clause'][0];
+                    $qb .= ", " . $this->quote($onClause['field'])
+                        . ", " . $this->quote(implode(' ', $onClause['operators']))
+                        . ", " . $this->quote($onClause['value']);
                 } else {
 
-                    $qb .= ',' . 'function($join) {';
+                    $qb .= ', function($join) {';
                     $qb .= '$join';
 
-                    foreach ($join['on_clause'] as $on_clause) {
+                    foreach ($join['on_clause'] as $onClause) {
 
-                        if ($on_clause['type'] == 'between' || $on_clause['raw_field'] || $on_clause['raw_value']) {
-                            if (isset($on_clause['const_value']))
-                                $on_clause['raw_value'] = !$on_clause['const_value'];
+                        if ($onClause['type'] == 'between' || $onClause['raw_field'] || $onClause['raw_value']) {
+                            if (isset($onClause['const_value']))
+                                $onClause['raw_value'] = !$onClause['const_value'];
                             $builder = new CriterionBuilder($this->options);
-                            $q = $builder->build(array($on_clause));
+                            $q = $builder->build(array($onClause));
                             $qb .= $q;
                         } else {
                             // no raw found and not between
-                            $operators = implode(' ', $on_clause['operators']);
-                            $fn_parts = $on_clause['sep'] == 'and' ? array('on') : array('or', 'on');
+                            $operators = implode(' ', $onClause['operators']);
+                            $fnParts = $onClause['sep'] == 'and' ? array('on') : array('or', 'on');
 
                             $qb .= '->';
-                            $qb .= $this->fnMerger($fn_parts);
+                            $qb .= $this->fnMerger($fnParts);
                             $qb .= '(';
 
-                            $qb .= $this->quote($on_clause['field'], $on_clause['raw_field'])
-                                . "," . $this->quote($operators)
-                                . "," . $this->quote($on_clause['value'],
-                                    !$on_clause['const_value'] && $on_clause['raw_value']);
+                            $qb .= $this->quote($onClause['field'], $onClause['raw_field'])
+                                . ", " . $this->quote($operators)
+                                . ", " . $this->quote($onClause['value'],
+                                    !$onClause['const_value'] && $onClause['raw_value']);
 
                             $qb .= ')';
                         }

@@ -13,7 +13,7 @@ namespace RexShijaku\SQLToLaravelBuilder\builders;
 class FromBuilder extends AbstractBuilder implements Builder
 {
 
-    public function build(array $parts, array &$skip_bag = array())
+    public function build(array $parts, array &$skipBag = array())
     {
         return 'table(' . $this->buildRawable($parts['table'], $parts['is_raw']) . ')';
     }

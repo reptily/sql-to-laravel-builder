@@ -15,14 +15,14 @@ class LimitBuilder extends AbstractBuilder implements Builder
 {
     public function build(array $parts, array &$skip_bag = array())
     {
-        $query_val = '';
+        $queryVal = '';
 
         if (isset($parts['offset']))
-            $query_val .= "->offset(" . $parts['offset'] . ')';
+            $queryVal .= "->offset(" . $parts['offset'] . ')';
         if (isset($parts['rowcount']))
-            $query_val .= "->limit(" . $parts['rowcount'] . ')';
+            $queryVal .= "->limit(" . $parts['rowcount'] . ')';
 
-        return $query_val;
+        return $queryVal;
     }
 
 }

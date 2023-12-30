@@ -30,9 +30,9 @@ use RexShijaku\SQLToLaravelBuilder\utils\CriterionTypes;
 class CriterionBuilder extends AbstractBuilder implements Builder
 {
 
-    public function build(array $parts, array &$skip_bag = array())
+    public function build(array $parts, array &$skipBag = array())
     {
-        $query_val = '';
+        $queryVal = '';
 
         foreach ($parts as $part) {
 
@@ -54,86 +54,86 @@ class CriterionBuilder extends AbstractBuilder implements Builder
                             $inner = $this->quote($part['field'] . ' ' . strtoupper($op) . ' ' . $part['value']) . '';
                     } else {
 
-                        $fn_parts = $this->getValue($part['sep']) == 'or' ? array('or', 'where') : array('where');
+                        $fnParts = $this->getValue($part['sep']) == 'or' ? array('or', 'where') : array('where');
 
                         if ($part['value'] == 'null') {
                             if ($op == 'is not') {
-                                $fn_parts[] = 'not';
-                                $fn_parts[] = 'null';
+                                $fnParts[] = 'not';
+                                $fnParts[] = 'null';
                             } else if ($op == 'is')
-                                $fn_parts[] = 'null';
+                                $fnParts[] = 'null';
                             $inner = $this->quote($part['field']);
                         } else
-                            $inner = $this->quote($part['field']) . ',' . $this->quote(strtoupper($op)) . ',' . $this->wrapValue($part['value']);
-                        $fn = $this->fnMerger($fn_parts);
+                            $inner = $this->quote($part['field']) . ', ' . $this->quote(strtoupper($op)) . ', ' . $this->wrapValue($part['value']);
+                        $fn = $this->fnMerger($fnParts);
                     }
-                    $query_val .= '->' . $fn . '(' . $inner . ')';
+                    $queryVal .= '->' . $fn . '(' . $inner . ')';
                     break;
 
                 case CriterionTypes::InFieldValue:
                 case CriterionTypes::InField: // for sub queries
 
-                    $value_php_arr = (isset($part['as_php_arr']) && $part['as_php_arr'] == true);
+                    $valuePHPArr = (isset($part['as_php_arr']) && $part['as_php_arr'] == true);
 
-                    if ($part['raw_field'] || ($part['raw_value'] && !$value_php_arr)) {
+                    if ($part['raw_field'] || ($part['raw_value'] && !$valuePHPArr)) {
                         // Raw Methods
                         $fn = $this->getValue($part['sep']) == 'or' ? 'orWhereRaw' : 'whereRaw';
-                        $query_val .= '->' . $fn . '(' . $this->quote($part['field'] . ' ' . strtoupper(implode(' ', $part['operators'])) . ' ' . $part['value']) . ')';
+                        $queryVal .= '->' . $fn . '(' . $this->quote($part['field'] . ' ' . strtoupper(implode(' ', $part['operators'])) . ' ' . $part['value']) . ')';
 
                     } else {
                         // Additional Where Clauses
-                        $operator_tokens = $this->getValue($part['sep']) == 'or' ? array('or', 'where') : array('where');
-                        $operator_tokens = array_merge($operator_tokens, $part['operators']); // not + in part (depending on what was passed)
-                        $fn = $this->fnMerger($operator_tokens);
+                        $operatorTokens = $this->getValue($part['sep']) == 'or' ? array('or', 'where') : array('where');
+                        $operatorTokens = array_merge($operatorTokens, $part['operators']); // not + in part (depending on what was passed)
+                        $fn = $this->fnMerger($operatorTokens);
 
-                        $query_val .= '->' . $fn . '(' . $this->quote($part['field']) . ',';
-                        if ($value_php_arr)
-                            $query_val .= '[' . $this->unBracket($part['value']) . ']';
+                        $queryVal .= '->' . $fn . '(' . $this->quote($part['field']) . ',';
+                        if ($valuePHPArr)
+                            $queryVal .= '[' . $this->unBracket($part['value']) . ']';
                         else
-                            $query_val .= '[' . $this->wrapValue($part['value']) . ']';
-                        $query_val .= ')';
+                            $queryVal .= '[' . $this->wrapValue($part['value']) . ']';
+                        $queryVal .= ')';
                     }
                     break;
                 case CriterionTypes::Between:
-                    $query_val .= $this->buildBetween($part);
+                    $queryVal .= $this->buildBetween($part);
                     break;
                 case CriterionTypes::Group:
-                    $this->buildGroup($part, $query_val);
+                    $this->buildGroup($part, $queryVal);
                     break;
                 case CriterionTypes::Against:
                     $fn = $this->getValue($part['sep']) == 'or' ? 'orWhereRaw' : 'whereRaw';
-                    $query_val .= '->' . $fn . '(' . $this->quote($part['field'] . ' AGAINST ' . $part['value']) . ')';
+                    $queryVal .= '->' . $fn . '(' . $this->quote($part['field'] . ' AGAINST ' . $part['value']) . ')';
                     break;
                 case CriterionTypes::Function:
                     $fn = $this->getValue($part['sep']) == 'or' ? 'orWhere' : 'where';
                     $fn = $this->fnMerger(array($fn, $part['fn']));
                     $op = $part['operator'];
-                    $inner = $this->quote($part['field']) . ',' . $this->quote(strtoupper($op)) . ',' . $this->wrapValue($part['value']['value']);
-                    $query_val .= '->' . $fn . '(' . $inner . ')';
+                    $inner = $this->quote($part['field']) . ',' . $this->quote(strtoupper($op)) . ', ' . $this->wrapValue($part['value']['value']);
+                    $queryVal .= '->' . $fn . '(' . $inner . ')';
                     break;
                 default:
                     break;
             }
 
         }
-        return $query_val;
+        return $queryVal;
     }
 
     public function buildAsArray(array $parts)
     {
-        $query_val = $this->arrayify($parts);
-        if ($query_val !== false)
-            return '->where(' . $query_val . ')';
+        $queryVal = $this->arrayify($parts);
+        if ($queryVal !== false)
+            return '->where(' . $queryVal . ')';
         return false;
     }
 
-    private function buildGroup($part, &$query_val)
+    private function buildGroup($part, &$queryVal)
     {
         if (in_array($part['se'], array('start', 'end'))) {
 
             $fn = '';
             if ($part['se'] == 'start') {
-                $query_val .= "->";
+                $queryVal .= "->";
 
                 if ($part['has_negation']) {  // when not is before group, only where can be used!
                     $fn = 'where(function ($query) { $query';
@@ -152,7 +152,7 @@ class CriterionBuilder extends AbstractBuilder implements Builder
                     $fn = ';})';
             }
 
-            $query_val .= $fn;
+            $queryVal .= $fn;
         }
     }
 
@@ -161,16 +161,16 @@ class CriterionBuilder extends AbstractBuilder implements Builder
         $query = '->';
         $prefix = $part['sep'] == 'and' ? null : 'or';
         if (in_array('not', $part['operators'])) { // is not between?
-            $fn_parts = ['where', 'not', 'between'];
+            $fnParts = ['where', 'not', 'between'];
             if ($prefix == 'or')
-                array_unshift($fn_parts, $prefix);
-            $fn = $this->fnMerger($fn_parts);
+                array_unshift($fnParts, $prefix);
+            $fn = $this->fnMerger($fnParts);
             $query .= $fn . '(' . $this->buildRawable($part['field'], $part['raw_field']) . ',';
         } else { // is simply between ?
-            $fn_parts = ['where', 'between'];
+            $fnParts = ['where', 'between'];
             if ($prefix == 'or')
-                array_unshift($fn_parts, $prefix);
-            $fn = $this->fnMerger($fn_parts);
+                array_unshift($fnParts, $prefix);
+            $fn = $this->fnMerger($fnParts);
             $query .= $fn . '(' . $this->buildRawable($part['field'], $part['raw_field']) . ',';
         }
 

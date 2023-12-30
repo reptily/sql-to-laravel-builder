@@ -18,10 +18,10 @@ interface Builder
      * Builds Query Builder methods.
      *
      * @param array $parts
-     * @param array $skip_bag
+     * @param array $skipBag
      * @return A string, which contains a part of Query Builder.
      */
-    public function build(array $parts, array &$skip_bag = array());
+    public function build(array $parts, array &$skipBag = array());
 }
 
 

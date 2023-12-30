@@ -12,9 +12,9 @@ namespace RexShijaku\SQLToLaravelBuilder\builders;
  */
 class UpdateBuilder extends AbstractBuilder implements Builder
 {
-    public function build(array $parts, array &$skip_bag = array())
+    public function build(array $parts, array &$skipBag = array())
     {
-        $skip_bag[] = 'SET';
+        $skipBag[] = 'SET';
         return '->update(' . $this->getSetAsArray($parts['records']) . ')';
     }
 
@@ -23,16 +23,16 @@ class UpdateBuilder extends AbstractBuilder implements Builder
         if (empty($records))
             return '[]';
 
-        $inner_array = '';
+        $innerArray = '';
         foreach ($records as $record) {
-            if (!empty($inner_array))
-                $inner_array .= ',';
+            if (!empty($innerArray))
+                $innerArray .= ', ';
 
-            $inner_array .= ($this->quote($record['field']) . '=>');
-            $inner_array .= $this->buildRawable($record['value'], $record['raw_val']);
+            $innerArray .= ($this->quote($record['field']) . '=>');
+            $innerArray .= $this->buildRawable($record['value'], $record['raw_val']);
 
         }
-        return '[' . $inner_array . ']';
+        return '[' . $innerArray . ']';
     }
 
 }

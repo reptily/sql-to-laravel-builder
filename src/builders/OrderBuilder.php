@@ -14,21 +14,21 @@ namespace RexShijaku\SQLToLaravelBuilder\builders;
 class OrderBuilder extends AbstractBuilder implements Builder
 {
 
-    function build(array $parts, array &$skip_bag = array())
+    function build(array $parts, array &$skipBag = array())
     {
         $q = '';
-        $is_raw = false;
+        $isRaw = false;
         foreach ($parts as $part)
             if ($part['raw']) {
-                $is_raw = true;
+                $isRaw = true;
                 break;
             }
 
-        if ($is_raw) {
+        if ($isRaw) {
             $inner = '';
             foreach ($parts as $k => $f_v) {
                 if (!empty($inner))
-                    $inner .= ',';
+                    $inner .= ', ';
 
                 if ($f_v['type'] == 'fn')
                     $inner .= ($f_v['dir']) . ' (' . ($f_v['field']) . ')';
@@ -36,14 +36,13 @@ class OrderBuilder extends AbstractBuilder implements Builder
                     $inner .= ($f_v['field']) . ' ' . ($f_v['dir']);
             }
 
-            $q .= '->orderByRaw' . "(" . $this->quote($inner) . ')';
+            $q .= '->orderByRaw(' . $this->quote($inner) . ')';
         } else {
             foreach ($parts as $k => $f_v)
-                $q .= "->orderBy(" . $this->quote($f_v['field']) . ',' . $this->quote($f_v['dir']) . ')';
+                $q .= "->orderBy(" . $this->quote($f_v['field']) . ', ' . $this->quote($f_v['dir']) . ')';
         }
 
         return $q;
     }
-
 
 }

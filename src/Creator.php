@@ -36,7 +36,7 @@ class Creator extends AbstractCreator
 {
     private $main;
     public $options;
-    public $skip_bag;
+    public $skipBag;
 
     function __construct($main, $options)
     {
@@ -54,10 +54,12 @@ class Creator extends AbstractCreator
         $build_res = $builder->build($parts, $this->skip_bag);
 
         $this->qb_closed = $build_res['close_qb'];
-        if ($build_res['type'] == 'eq')
+        if ($build_res['type'] == 'eq') {
             $this->qb = $build_res['query_part'];
-        else if ($build_res['type'] == 'lastly')
+        }
+        else if ($build_res['type'] == 'lastly') {
             $this->lastly = $build_res['query_part'];
+        }
     }
 
     public function from($value, $parsed)
@@ -66,21 +68,21 @@ class Creator extends AbstractCreator
         $from_builder = new FromBuilder($this->options);
 
         if ($this->isSingleTable($parsed)) {
-            $from_parts = $from_extractor->extractSingle($value);
-            $this->qb = $from_builder->build($from_parts, $this->skip_bag) . $this->qb;
+            $fromParts = $from_extractor->extractSingle($value);
+            $this->qb = $from_builder->build($fromParts, $this->skip_bag) . $this->qb;
         } else { // more than one table involved ?
 
-            $from_parts = $from_extractor->extract($value);
-            if (isset($from_parts['joins'])) { // invalid joins found ?
+            $fromParts = $from_extractor->extract($value);
+            if (isset($fromParts['joins'])) { // invalid joins found ?
                 throw new \Exception('Invalid join type found! ');
             } else {
-                $this->qb = $from_builder->build($from_parts) . $this->qb;
+                $this->qb = $from_builder->build($fromParts) . $this->qb;
 
-                $join_extractor = new JoinExtractor($this->options);
-                $join_builder = new JoinBuilder($this->options);
+                $joinExtractor = new JoinExtractor($this->options);
+                $joinBuilder = new JoinBuilder($this->options);
 
-                $joins = $join_extractor->extract($value);
-                $this->qb .= $join_builder->build($joins);
+                $joins = $joinExtractor->extract($value);
+                $this->qb .= $joinBuilder->build($joins);
             }
         }
     }
@@ -90,8 +92,9 @@ class Creator extends AbstractCreator
         $extractor = new CriterionExtractor($this->options);
         $builder = new CriterionBuilder($this->options);
 
-        if ($extractor->extractAsArray($value, $part))
+        if ($extractor->extractAsArray($value, $part)) {
             $q = $builder->buildAsArray($part);
+        }
         else {
             $parts = $extractor->extract($value);
             $q = $builder->build($parts);

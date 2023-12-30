@@ -13,7 +13,7 @@ namespace RexShijaku\SQLToLaravelBuilder\builders;
 class UnionBuilder extends AbstractBuilder implements Builder
 {
 
-    public function build(array $parts, array &$skip_bag = array())
+    public function build(array $parts, array &$skipBag = array())
     {
         $q = '';
         foreach ($parts as $k => $part) {

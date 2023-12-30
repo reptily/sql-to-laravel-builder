@@ -21,21 +21,22 @@ use RexShijaku\SQLToLaravelBuilder\utils\SelectQueryTypes;
  */
 class SelectBuilder extends AbstractBuilder implements Builder
 {
-    public function build(array $parts, array &$skip_bag = array())
+    public function build(array $parts, array &$skipBag = array())
     {
         $type = $parts['s_type'];
         $parts = $parts['parts'];
 
         $qb = '';
-        if ($parts['distinct'])
+        if ($parts['distinct']) {
             $qb = $this->distinctQ();
+        }
 
         switch ($type) {
             case SelectQueryTypes::Aggregate:
-                $qb .= $this->aggregateQ($parts['suffix'], $parts['column'], $parts['alias'], $close_qb);
-                return array('query_part' => $qb, 'type' => $close_qb ? 'lastly' : 'eq', 'close_qb' => $close_qb);
+                $qb .= $this->aggregateQ($parts['suffix'], $parts['column'], $parts['alias'], $closeQb);
+                return array('query_part' => $qb, 'type' => $closeQb ? 'lastly' : 'eq', 'close_qb' => $closeQb);
             case SelectQueryTypes::CountATable:
-                $skip_bag[] = 'FROM';
+                $skipBag[] = 'FROM';
                 $qb .= $this->countAllQ($parts['table']);
                 return array('query_part' => $qb, 'type' => 'eq', 'close_qb' => true);
             case SelectQueryTypes::Other:
@@ -46,19 +47,21 @@ class SelectBuilder extends AbstractBuilder implements Builder
         }
     }
 
-    private function aggregateQ($suffix, $column, $alias, &$close_qb)
+    private function aggregateQ($suffix, $column, $alias, &$closeQb)
     {
-        $close_qb = false;
+        $closeQb = false;
         if ($alias !== false) {
             $fn = strtoupper($suffix) . '(' . $column . ')';
             $qb = "->selectRaw(" . $this->buildRawable($fn . " AS " . $alias) . ")";
         } else {
-            $close_qb = true; // max(something) is the end of query / or count
-            if ($column != '*')
+            $closeQb = true; // max(something) is the end of query / or count
+            if ($column != '*') {
                 $qb = '->' . $this->getValue($suffix) . '(' . $this->quote($column) . ')';
-            else
+            } else {
                 $qb = '->' . $this->getValue($suffix) . '()';
+            }
         }
+
         return $qb;
     }
 

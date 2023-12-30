@@ -43,7 +43,7 @@ abstract class AbstractBuilder
         $str = trim($str, '\"');
         $str = trim($str, '\'');
         $str = addslashes($str);
-        return "'" . $str . "'";;
+        return "'" . $str . "'";
     }
 
     /**
@@ -83,13 +83,13 @@ abstract class AbstractBuilder
 
             $value = $parts['values'][$k];
             if (!empty($operator))
-                $all[] = '[' . $this->quote($field) . ',' . $this->quote(strtoupper($operator)) . ',' . $this->wrapValue($value) . ']';
+                $all[] = '[' . $this->quote($field) . ', ' . $this->quote(strtoupper($operator)) . ', ' . $this->wrapValue($value) . ']';
             else
-                $all[] = '[' . $this->quote($field) . ',' . $this->wrapValue($value) . ']';
+                $all[] = '[' . $this->quote($field) . ', ' . $this->wrapValue($value) . ']';
         }
 
         if (!empty($all))
-            return "[" . implode(',', $all) . ']';
+            return "[" . implode(', ', $all) . ']';
         else
             return false;
     }
@@ -128,12 +128,12 @@ abstract class AbstractBuilder
      * Builds a rawable Query Builder method
      *
      * @param $val
-     * @param false $is_raw
+     * @param bool $isRaw
      * @return int|string
      */
-    protected function buildRawable($val, $is_raw = false)
+    protected function buildRawable($val, $isRaw = false)
     {
         $val = $this->wrapValue($val);
-        return $is_raw ? $this->options['facade'] . 'raw(' . $val . ')' : $val;
+        return $isRaw ? $this->options['facade'] . 'raw(' . $val . ')' : $val;
     }
 }

@@ -19,10 +19,10 @@ class AbstractCreator
 
     function isSingleTable($parsed)
     {
-        if (isset($parsed['FROM'])) {
-            if (count($parsed['FROM']) == 1)
+        if (isset($parsed['FROM']) && count($parsed['FROM']) == 1) {
                 return $parsed['FROM'][0]['expr_type'] == 'table';
         }
+
         return false;
     }
 

@@ -12,7 +12,7 @@ namespace RexShijaku\SQLToLaravelBuilder\builders;
  */
 class DeleteBuilder extends AbstractBuilder implements Builder
 {
-    public function build(array $parts, array &$skip_bag = array())
+    public function build(array $parts, array &$skipBag = array())
     {
         return '->delete()';
     }
