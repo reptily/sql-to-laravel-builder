@@ -1,8 +1,8 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\builders;
+namespace Reptily\SQLToLaravelBuilder\builders;
 
-use RexShijaku\SQLToLaravelBuilder\utils\SelectQueryTypes;
+use Reptily\SQLToLaravelBuilder\utils\SelectQueryTypes;
 
 /**
  * This class constructs and produces following Query Builder methods :
@@ -21,7 +21,7 @@ use RexShijaku\SQLToLaravelBuilder\utils\SelectQueryTypes;
  */
 class SelectBuilder extends AbstractBuilder implements Builder
 {
-    public function build(array $parts, array &$skipBag = array())
+    public function build(array $parts, array &$skipBag = [])
     {
         $type = $parts['s_type'];
         $parts = $parts['parts'];
@@ -32,16 +32,16 @@ class SelectBuilder extends AbstractBuilder implements Builder
         }
 
         switch ($type) {
-            case SelectQueryTypes::Aggregate:
+            case SelectQueryTypes::AGGREGATE:
                 $qb .= $this->aggregateQ($parts['suffix'], $parts['column'], $parts['alias'], $closeQb);
-                return array('query_part' => $qb, 'type' => $closeQb ? 'lastly' : 'eq', 'close_qb' => $closeQb);
-            case SelectQueryTypes::CountATable:
+                return ['query_part' => $qb, 'type' => $closeQb ? 'lastly' : 'eq', 'close_qb' => $closeQb];
+            case SelectQueryTypes::COUNT_A_TABLE:
                 $skipBag[] = 'FROM';
                 $qb .= $this->countAllQ($parts['table']);
-                return array('query_part' => $qb, 'type' => 'eq', 'close_qb' => true);
-            case SelectQueryTypes::Other:
+                return ['query_part' => $qb, 'type' => 'eq', 'close_qb' => true];
+            case SelectQueryTypes::OTHER:
                 $qb .= $this->selectOnlyQ($parts['selected'], $parts['raws']);
-                return array('query_part' => $qb, 'type' => 'eq', 'close_qb' => false);
+                return ['query_part' => $qb, 'type' => 'eq', 'close_qb' => false];
             default:
                 break;
         }
@@ -67,18 +67,20 @@ class SelectBuilder extends AbstractBuilder implements Builder
 
     private function selectOnlyQ($parts, $raws)
     {
-        $column_len = count($parts);
+        $columnLen = count($parts);
 
-        if ($column_len == 1 && $parts[0] == '*')
+        if ($columnLen == 1 && $parts[0] == '*') {
             return '';
+        }
 
         $query = '->';
-        $ci_part = 'select'; // to be done selectRaw
-        $query .= $ci_part . "(";
+        $ciPart = 'select'; // to be done selectRaw
+        $query .= $ciPart . "(";
         foreach ($parts as $k => $column) {
             $query .= $this->buildRawable($column, $raws[$k]);
-            if ($k + 1 != $column_len)
-                $query .= ',';
+            if ($k + 1 != $columnLen) {
+                $query .= ', ';
+            }
         }
         $query .= ")";
         return $query;

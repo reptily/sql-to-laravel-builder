@@ -1,30 +1,30 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder;
+namespace Reptily\SQLToLaravelBuilder;
 
-use RexShijaku\SQLToLaravelBuilder\builders\CriterionBuilder;
-use RexShijaku\SQLToLaravelBuilder\builders\DeleteBuilder;
-use RexShijaku\SQLToLaravelBuilder\builders\FromBuilder;
-use RexShijaku\SQLToLaravelBuilder\builders\GroupByBuilder;
-use RexShijaku\SQLToLaravelBuilder\builders\HavingBuilder;
-use RexShijaku\SQLToLaravelBuilder\builders\InsertBuilder;
-use RexShijaku\SQLToLaravelBuilder\builders\JoinBuilder;
-use RexShijaku\SQLToLaravelBuilder\builders\LimitBuilder;
-use RexShijaku\SQLToLaravelBuilder\builders\OrderBuilder;
-use RexShijaku\SQLToLaravelBuilder\builders\SelectBuilder;
-use RexShijaku\SQLToLaravelBuilder\builders\UnionBuilder;
-use RexShijaku\SQLToLaravelBuilder\builders\UpdateBuilder;
-use RexShijaku\SQLToLaravelBuilder\extractors\CriterionExtractor;
-use RexShijaku\SQLToLaravelBuilder\extractors\DeleteExtractor;
-use RexShijaku\SQLToLaravelBuilder\extractors\FromExtractor;
-use RexShijaku\SQLToLaravelBuilder\extractors\GroupByExtractor;
-use RexShijaku\SQLToLaravelBuilder\extractors\HavingExtractor;
-use RexShijaku\SQLToLaravelBuilder\extractors\InsertExtractor;
-use RexShijaku\SQLToLaravelBuilder\extractors\JoinExtractor;
-use RexShijaku\SQLToLaravelBuilder\extractors\LimitExtractor;
-use RexShijaku\SQLToLaravelBuilder\extractors\OrderExtractor;
-use RexShijaku\SQLToLaravelBuilder\extractors\SelectExtractor;
-use RexShijaku\SQLToLaravelBuilder\extractors\UpdateExtractor;
+use Reptily\SQLToLaravelBuilder\builders\CriterionBuilder;
+use Reptily\SQLToLaravelBuilder\builders\DeleteBuilder;
+use Reptily\SQLToLaravelBuilder\builders\FromBuilder;
+use Reptily\SQLToLaravelBuilder\builders\GroupByBuilder;
+use Reptily\SQLToLaravelBuilder\builders\HavingBuilder;
+use Reptily\SQLToLaravelBuilder\builders\InsertBuilder;
+use Reptily\SQLToLaravelBuilder\builders\JoinBuilder;
+use Reptily\SQLToLaravelBuilder\builders\LimitBuilder;
+use Reptily\SQLToLaravelBuilder\builders\OrderBuilder;
+use Reptily\SQLToLaravelBuilder\builders\SelectBuilder;
+use Reptily\SQLToLaravelBuilder\builders\UnionBuilder;
+use Reptily\SQLToLaravelBuilder\builders\UpdateBuilder;
+use Reptily\SQLToLaravelBuilder\extractors\CriterionExtractor;
+use Reptily\SQLToLaravelBuilder\extractors\DeleteExtractor;
+use Reptily\SQLToLaravelBuilder\extractors\FromExtractor;
+use Reptily\SQLToLaravelBuilder\extractors\GroupByExtractor;
+use Reptily\SQLToLaravelBuilder\extractors\HavingExtractor;
+use Reptily\SQLToLaravelBuilder\extractors\InsertExtractor;
+use Reptily\SQLToLaravelBuilder\extractors\JoinExtractor;
+use Reptily\SQLToLaravelBuilder\extractors\LimitExtractor;
+use Reptily\SQLToLaravelBuilder\extractors\OrderExtractor;
+use Reptily\SQLToLaravelBuilder\extractors\SelectExtractor;
+use Reptily\SQLToLaravelBuilder\extractors\UpdateExtractor;
 
 /**
  * This class orchestrates the process between Extractors and Builders in order to produce parts of Query Builder and arranges them
@@ -34,49 +34,48 @@ use RexShijaku\SQLToLaravelBuilder\extractors\UpdateExtractor;
  */
 class Creator extends AbstractCreator
 {
-    private $main;
     public $options;
     public $skipBag;
+    public bool $isSelect = false;
 
-    function __construct($main, $options)
+    public function __construct($options)
     {
-        $this->main = $main;
         $this->options = $options;
-        $this->skip_bag = array();
+        $this->skipBag = [];
     }
 
     public function select($value, $parsed)
     {
+        $this->isSelect = true;
         $extractor = new SelectExtractor($this->options);
         $builder = new SelectBuilder($this->options);
 
         $parts = $extractor->extract($value, $parsed);
-        $build_res = $builder->build($parts, $this->skip_bag);
+        $buildRes = $builder->build($parts, $this->skipBag);
 
-        $this->qb_closed = $build_res['close_qb'];
-        if ($build_res['type'] == 'eq') {
-            $this->qb = $build_res['query_part'];
-        }
-        else if ($build_res['type'] == 'lastly') {
-            $this->lastly = $build_res['query_part'];
+        $this->qbClosed = $buildRes['close_qb'];
+        if ($buildRes['type'] == 'eq') {
+            $this->qb = $buildRes['query_part'];
+        } else if ($buildRes['type'] == 'lastly') {
+            $this->lastly = $buildRes['query_part'];
         }
     }
 
     public function from($value, $parsed)
     {
-        $from_extractor = new FromExtractor($this->options);
-        $from_builder = new FromBuilder($this->options);
+        $fromExtractor = new FromExtractor($this->options);
+        $fromBuilder = new FromBuilder($this->options);
 
         if ($this->isSingleTable($parsed)) {
-            $fromParts = $from_extractor->extractSingle($value);
-            $this->qb = $from_builder->build($fromParts, $this->skip_bag) . $this->qb;
+            $fromParts = $fromExtractor->extractSingle($value);
+            $this->qb = $fromBuilder->build($fromParts, $this->skipBag) . $this->qb;
         } else { // more than one table involved ?
 
-            $fromParts = $from_extractor->extract($value);
+            $fromParts = $fromExtractor->extract($value);
             if (isset($fromParts['joins'])) { // invalid joins found ?
                 throw new \Exception('Invalid join type found! ');
             } else {
-                $this->qb = $from_builder->build($fromParts) . $this->qb;
+                $this->qb = $fromBuilder->build($fromParts) . $this->qb;
 
                 $joinExtractor = new JoinExtractor($this->options);
                 $joinBuilder = new JoinBuilder($this->options);
@@ -160,7 +159,7 @@ class Creator extends AbstractCreator
         $builder = new UpdateBuilder($this->options);
 
         $parts = $extractor->extract($value, $parsed);
-        $q = $builder->build($parts, $this->skip_bag);
+        $q = $builder->build($parts, $this->skipBag);
         $this->lastly = $q;
     }
 
@@ -168,8 +167,8 @@ class Creator extends AbstractCreator
     {
         $extractor = new DeleteExtractor($this->options);
         $builder = new DeleteBuilder($this->options);
-        $parts = $extractor->extract(array(), $parsed);
-        $this->lastly = $builder->build($parts, $this->skip_bag);
+        $parts = $extractor->extract([], $parsed);
+        $this->lastly = $builder->build($parts, $this->skipBag);
     }
 
     public function union($parts)
@@ -181,17 +180,21 @@ class Creator extends AbstractCreator
     function getQuery($sql, $add_facade = false)
     {
         $this->qb .= $this->lastly;
-        if (empty($this->qb)) {
-            if ($add_facade)
+        if (empty($this->qb) || !$this->isSelect) {
+            if ($add_facade) {
                 $this->qb .= $this->options['facade'];
-            $this->qb .= "statement('" . $sql . "')";
+                $this->qb .= "statement('" . $sql . "')";
+            }
         } else {
-            if (!$this->qb_closed)
-                $this->qb .= $this->in_union ? '' : '->get()';
+            if (!$this->qbClosed) {
+                $this->qb .= $this->inUnion ? '' : '->get()';
+            }
         }
 
-        if (!$this->in_union)
+        if (!$this->inUnion) {
             $this->qb .= ';';
+        }
+
         return $this->qb;
     }
 

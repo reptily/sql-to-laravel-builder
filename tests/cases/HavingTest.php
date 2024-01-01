@@ -1,8 +1,8 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\Test;
+namespace Reptily\SQLToLaravelBuilder\Test;
 
-use RexShijaku\SQLToLaravelBuilder\SQLToLaravelBuilder;
+use Reptily\SQLToLaravelBuilder\SQLToLaravelBuilder;
 
 class HavingTest extends AbstractCases
 {

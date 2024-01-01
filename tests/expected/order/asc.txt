@@ -1,1 +1,1 @@
-DB::table('members')->orderBy('name','DESC')->orderBy('surname','ASC')->get();
+DB::table('members')->orderByDesc('name')->orderBy('surname')->get();

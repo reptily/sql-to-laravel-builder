@@ -1,1 +1,1 @@
-DB::table('members')->where('age','=',25)->where('name','=','David')->get();
+DB::table('members')->where('age', '=', 25)->where('name', '=', 'David')->get();

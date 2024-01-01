@@ -1,6 +1,6 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\extractors;
+namespace Reptily\SQLToLaravelBuilder\extractors;
 
 /**
  *  Extractor.php
@@ -21,6 +21,6 @@ interface Extractor
      * @param array $parsed
      * @return A string, which contains a part of an SQL statement.
      */
-    public function extract(array $value, array $parsed = array());
+    public function extract(array $value, array $parsed = []);
 }
 

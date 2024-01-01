@@ -1,1 +1,1 @@
-DB::table('members')->where('age','>',30)->orWhere(function ($query) { $query->where('name','LIKE','J%')->orWhere(function ($query) { $query->where('surname','=','P')->whereNotNull('name');});})->where('AGE','!=',30)->get();
+DB::table('members')->where('age', '>', 30)->orWhere(function (Builder $query) { $query->where('name', 'LIKE', 'J%')->orWhere(function (Builder $query) { $query->where('surname', '=', 'P')->whereNotNull('name');});})->where('AGE', '!=', 30)->get();

@@ -1,8 +1,8 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\builders;
+namespace Reptily\SQLToLaravelBuilder\builders;
 
-use RexShijaku\SQLToLaravelBuilder\utils\CriterionTypes;
+use Reptily\SQLToLaravelBuilder\utils\CriterionTypes;
 
 /**
  * This class constructs and produces following Query Builder methods :
@@ -38,9 +38,9 @@ class CriterionBuilder extends AbstractBuilder implements Builder
 
             switch ($part['type']) {
 
-                case CriterionTypes::Comparison:
-                case CriterionTypes::Is:
-                case CriterionTypes::Like:
+                case CriterionTypes::COMPARISON:
+                case CriterionTypes::IS:
+                case CriterionTypes::LIKE:
                     $op = implode(' ', $part['operators']);
                     $part['value'] = $this->getValue($part['value']) == 'null' ? 'null' : $part['value'];
 
@@ -54,7 +54,7 @@ class CriterionBuilder extends AbstractBuilder implements Builder
                             $inner = $this->quote($part['field'] . ' ' . strtoupper($op) . ' ' . $part['value']) . '';
                     } else {
 
-                        $fnParts = $this->getValue($part['sep']) == 'or' ? array('or', 'where') : array('where');
+                        $fnParts = $this->getValue($part['sep']) == 'or' ? ['or', 'where'] : ['where'];
 
                         if ($part['value'] == 'null') {
                             if ($op == 'is not') {
@@ -70,8 +70,8 @@ class CriterionBuilder extends AbstractBuilder implements Builder
                     $queryVal .= '->' . $fn . '(' . $inner . ')';
                     break;
 
-                case CriterionTypes::InFieldValue:
-                case CriterionTypes::InField: // for sub queries
+                case CriterionTypes::IN_FIELD_VALUE:
+                case CriterionTypes::IN_FIELD: // for sub queries
 
                     $valuePHPArr = (isset($part['as_php_arr']) && $part['as_php_arr'] == true);
 
@@ -82,74 +82,78 @@ class CriterionBuilder extends AbstractBuilder implements Builder
 
                     } else {
                         // Additional Where Clauses
-                        $operatorTokens = $this->getValue($part['sep']) == 'or' ? array('or', 'where') : array('where');
+                        $operatorTokens = $this->getValue($part['sep']) == 'or' ? ['or', 'where'] : ['where'];
                         $operatorTokens = array_merge($operatorTokens, $part['operators']); // not + in part (depending on what was passed)
                         $fn = $this->fnMerger($operatorTokens);
 
-                        $queryVal .= '->' . $fn . '(' . $this->quote($part['field']) . ',';
-                        if ($valuePHPArr)
+                        $queryVal .= '->' . $fn . '(' . $this->quote($part['field']) . ', ';
+                        if ($valuePHPArr) {
                             $queryVal .= '[' . $this->unBracket($part['value']) . ']';
-                        else
+                        } else {
                             $queryVal .= '[' . $this->wrapValue($part['value']) . ']';
+                        }
                         $queryVal .= ')';
                     }
                     break;
-                case CriterionTypes::Between:
+                case CriterionTypes::BETWEEN:
                     $queryVal .= $this->buildBetween($part);
                     break;
-                case CriterionTypes::Group:
+                case CriterionTypes::GROUP:
                     $this->buildGroup($part, $queryVal);
                     break;
-                case CriterionTypes::Against:
+                case CriterionTypes::AGAINST:
                     $fn = $this->getValue($part['sep']) == 'or' ? 'orWhereRaw' : 'whereRaw';
                     $queryVal .= '->' . $fn . '(' . $this->quote($part['field'] . ' AGAINST ' . $part['value']) . ')';
                     break;
-                case CriterionTypes::Function:
+                case CriterionTypes::FN:
                     $fn = $this->getValue($part['sep']) == 'or' ? 'orWhere' : 'where';
                     $fn = $this->fnMerger(array($fn, $part['fn']));
                     $op = $part['operator'];
-                    $inner = $this->quote($part['field']) . ',' . $this->quote(strtoupper($op)) . ', ' . $this->wrapValue($part['value']['value']);
+                    $inner = $this->quote($part['field']) . ', ' . $this->quote(strtoupper($op)) . ', ' . $this->wrapValue($part['value']['value']);
                     $queryVal .= '->' . $fn . '(' . $inner . ')';
                     break;
                 default:
                     break;
             }
-
         }
+
         return $queryVal;
     }
 
     public function buildAsArray(array $parts)
     {
         $queryVal = $this->arrayify($parts);
-        if ($queryVal !== false)
+        if ($queryVal !== false) {
             return '->where(' . $queryVal . ')';
+        }
+
         return false;
     }
 
     private function buildGroup($part, &$queryVal)
     {
-        if (in_array($part['se'], array('start', 'end'))) {
-
+        if (in_array($part['se'], ['start', 'end'])) {
             $fn = '';
             if ($part['se'] == 'start') {
                 $queryVal .= "->";
 
                 if ($part['has_negation']) {  // when not is before group, only where can be used!
-                    $fn = 'where(function ($query) { $query';
+                    $fn = 'where(function (Builder $query) { $query';
                 } else {
-                    if ($part['log'] == 'or')
-                        $fn = 'orWhere(function ($query) { $query';
-                    else
-                        $fn = 'where(function ($query) { $query';
+                    if ($part['log'] == 'or') {
+                        $fn = 'orWhere(function (Builder $query) { $query';
+                    } else {
+                        $fn = 'where(function (Builder $query) { $query';
+                    }
                 }
 
 
             } else if ($part['se'] == 'end') {
-                if ($part['has_negation'])
-                    $fn = ';},null,null,\'' . $part['log'] . ' ' . 'not' . '\')'; // see https://github.com/laravel/ideas/issues/708
-                else
+                if ($part['has_negation']) {
+                    $fn = ';}, null, null, \'' . $part['log'] . ' ' . 'not' . '\')'; // see https://github.com/laravel/ideas/issues/708
+                } else {
                     $fn = ';})';
+                }
             }
 
             $queryVal .= $fn;
@@ -162,19 +166,21 @@ class CriterionBuilder extends AbstractBuilder implements Builder
         $prefix = $part['sep'] == 'and' ? null : 'or';
         if (in_array('not', $part['operators'])) { // is not between?
             $fnParts = ['where', 'not', 'between'];
-            if ($prefix == 'or')
+            if ($prefix == 'or') {
                 array_unshift($fnParts, $prefix);
+            }
             $fn = $this->fnMerger($fnParts);
-            $query .= $fn . '(' . $this->buildRawable($part['field'], $part['raw_field']) . ',';
+            $query .= $fn . '(' . $this->buildRawable($part['field'], $part['raw_field']) . ', ';
         } else { // is simply between ?
             $fnParts = ['where', 'between'];
-            if ($prefix == 'or')
+            if ($prefix == 'or') {
                 array_unshift($fnParts, $prefix);
+            }
             $fn = $this->fnMerger($fnParts);
-            $query .= $fn . '(' . $this->buildRawable($part['field'], $part['raw_field']) . ',';
+            $query .= $fn . '(' . $this->buildRawable($part['field'], $part['raw_field']) . ', ';
         }
 
-        $query .= '[' . $this->buildRawable($part['value1'], $part['raw_values'][0]) . ',' .
+        $query .= '[' . $this->buildRawable($part['value1'], $part['raw_values'][0]) . ', ' .
             $this->buildRawable($part['value2'], $part['raw_values'][1]) . ']' . ')';
 
         return $query;

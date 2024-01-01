@@ -1,6 +1,6 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\builders;
+namespace Reptily\SQLToLaravelBuilder\builders;
 
 /**
  * This class constructs and produces following Query Builder methods :
@@ -13,20 +13,21 @@ namespace RexShijaku\SQLToLaravelBuilder\builders;
 class UnionBuilder extends AbstractBuilder implements Builder
 {
 
-    public function build(array $parts, array &$skipBag = array())
+    public function build(array $parts, array &$skipBag = [])
     {
         $q = '';
         foreach ($parts as $k => $part) {
             if ($k == 0) {
                 $q .= $part['str'];
             } else {
-
-                if ($part['is_all'] === 1)
+                if ($part['is_all'] === 1) {
                     $q .= '->unionAll(' . $part['str'] . ')';
-                else
+                } else {
                     $q .= '->union(' . $part['str'] . ')';
+                }
             }
         }
+
         return $q . '->get();';
     }
 }

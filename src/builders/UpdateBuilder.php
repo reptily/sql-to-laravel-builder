@@ -1,6 +1,6 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\builders;
+namespace Reptily\SQLToLaravelBuilder\builders;
 
 /**
  * This class constructs and produces following Query Builder methods :
@@ -12,7 +12,7 @@ namespace RexShijaku\SQLToLaravelBuilder\builders;
  */
 class UpdateBuilder extends AbstractBuilder implements Builder
 {
-    public function build(array $parts, array &$skipBag = array())
+    public function build(array $parts, array &$skipBag = [])
     {
         $skipBag[] = 'SET';
         return '->update(' . $this->getSetAsArray($parts['records']) . ')';
@@ -25,13 +25,14 @@ class UpdateBuilder extends AbstractBuilder implements Builder
 
         $innerArray = '';
         foreach ($records as $record) {
-            if (!empty($innerArray))
+            if (!empty($innerArray)) {
                 $innerArray .= ', ';
+            }
 
-            $innerArray .= ($this->quote($record['field']) . '=>');
-            $innerArray .= $this->buildRawable($record['value'], $record['raw_val']);
-
+            $innerArray .= ($this->quote($record['field']) . ' => ')
+                . $this->buildRawable($record['value'], $record['raw_val']);
         }
+
         return '[' . $innerArray . ']';
     }
 

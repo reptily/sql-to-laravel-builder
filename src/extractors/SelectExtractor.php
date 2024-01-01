@@ -1,8 +1,8 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\extractors;
+namespace Reptily\SQLToLaravelBuilder\extractors;
 
-use RexShijaku\SQLToLaravelBuilder\utils\SelectQueryTypes;
+use Reptily\SQLToLaravelBuilder\utils\SelectQueryTypes;
 
 /**
  * This class extracts and compiles SQL query parts for the following Query Builder methods :
@@ -21,23 +21,28 @@ use RexShijaku\SQLToLaravelBuilder\utils\SelectQueryTypes;
  */
 class SelectExtractor extends AbstractExtractor implements Extractor
 {
-    public function extract(array $value, array $parsed = array())
+    public function extract(array $value, array $parsed = [])
     {
         $distinct = $this->isDistinct($value);
-        if ($distinct)
+        if ($distinct) {
             array_shift($value);
+        }
 
         if ($this->isSingleTable($parsed) &&
             $this->isCountTable($value) && $this->validCountTable($parsed)) {
 
-            return array('s_type' => SelectQueryTypes::CountATable, 'parts' => array('table' => $parsed['FROM'][0]['base_expr'], 'distinct' => $distinct, 'selected' => 'COUNT(*)'));
-
-        } else if ($this->isAggregate($value))
-            return array('s_type' => SelectQueryTypes::Aggregate,
-                'parts' => $this->extractAggregateParts($value, $distinct));
+            return [
+                's_type' => SelectQueryTypes::COUNT_A_TABLE,
+                'parts' => ['table' => $parsed['FROM'][0]['base_expr'], 'distinct' => $distinct, 'selected' => 'COUNT(*)'],
+            ];
+        } else if ($this->isAggregate($value)) {
+            return ['s_type' => SelectQueryTypes::AGGREGATE,
+                'parts' => $this->extractAggregateParts($value, $distinct)];
+        }
 
         $this->getExpressionParts($value, $parts, $raws);
-        return array('s_type' => SelectQueryTypes::Other, 'parts' => array('selected' => $parts, 'distinct' => $distinct, 'raws' => $raws));
+
+        return ['s_type' => SelectQueryTypes::OTHER, 'parts' => ['selected' => $parts, 'distinct' => $distinct, 'raws' => $raws]];
     }
 
     private function isAggregate($value)
@@ -63,9 +68,11 @@ class SelectExtractor extends AbstractExtractor implements Extractor
         $column = implode('', $parts);
 
         $alias = $this->hasAlias($value[0]);
-        if ($alias)
+        if ($alias) {
             $alias = $value[0]['alias']['name'];
-        return array('suffix' => $fn_suffix, 'column' => $column, 'alias' => $alias, 'distinct' => $distinct);
+        }
+
+        return ['suffix' => $fn_suffix, 'column' => $column, 'alias' => $alias, 'distinct' => $distinct];
     }
 
 }

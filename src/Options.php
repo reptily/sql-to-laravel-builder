@@ -1,16 +1,16 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder;
+namespace Reptily\SQLToLaravelBuilder;
 
 class Options
 {
     private $options;
-    private $aggregate_fn = array('sum', 'min', 'max', 'avg', 'sum', 'count');
-    private $defaults = array(
+    private $aggregateFn =['sum', 'min', 'max', 'avg', 'sum', 'count'];
+    private $defaults = [
         'facade' => 'DB::',
         'group' => true
-    );
-    private $supporting_fn = array('date', 'month', 'year' ,'day', 'time');
+    ];
+    private $supportingFn = ['date', 'month', 'year' ,'day', 'time'];
 
     public function __construct($options)
     {
@@ -19,8 +19,9 @@ class Options
 
     public function set(): void
     {
-        if (!is_array($this->options))
-            $this->options = array();
+        if (!is_array($this->options)) {
+            $this->options = [];
+        }
 
         foreach ($this->defaults as $k => $v)
             if (!key_exists($k, $this->options))
@@ -31,13 +32,12 @@ class Options
             }
 
         unset($this->options['settings']); // unset reserved
-        $this->options['settings']['agg'] = $this->aggregate_fn;
-        $this->options['settings']['fns'] = $this->supporting_fn;
+        $this->options['settings']['agg'] = $this->aggregateFn;
+        $this->options['settings']['fns'] = $this->supportingFn;
     }
 
     public function get()
     {
         return $this->options;
     }
-
 }

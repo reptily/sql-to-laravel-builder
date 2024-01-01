@@ -1,6 +1,6 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\builders;
+namespace Reptily\SQLToLaravelBuilder\builders;
 
 /**
  * This class constructs and produces following Query Builder methods :
@@ -13,7 +13,7 @@ namespace RexShijaku\SQLToLaravelBuilder\builders;
 class InsertBuilder extends AbstractBuilder implements Builder
 {
 
-    public function build(array $parts, array &$skipBag = array())
+    public function build(array $parts, array &$skipBag = [])
     {
         $qb = '';
         $recordLen = count($parts['records']);
@@ -39,9 +39,9 @@ class InsertBuilder extends AbstractBuilder implements Builder
             $singleArray = $isBatch ? '[' : '';
             foreach ($record as $k => $colVal) {
                 if ($k > 0) {
-                    $singleArray .= ',';
+                    $singleArray .= ', ';
                 }
-                $singleArray .= $this->quote($parts['columns'][$k]) . '=>' . ($this->wrapValue($colVal));
+                $singleArray .= $this->quote($parts['columns'][$k]) . ' => ' . ($this->wrapValue($colVal));
 
             }
             $innerArrays .= $singleArray . ($isBatch ? ']' : '');

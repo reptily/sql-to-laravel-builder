@@ -1,10 +1,10 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\utils;
+namespace Reptily\SQLToLaravelBuilder\utils;
 
-class CriterionContext
+interface CriterionContext
 {
-    const Having = 'having';
-    const Where = 'where';
-    const Join = 'join';
+    public const HAVING = 'having';
+    public const WHERE = 'where';
+    public const JOIN = 'join';
 }

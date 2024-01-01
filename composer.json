@@ -1,5 +1,5 @@
 {
-  "name": "rexshijaku/sql-to-laravel-builder",
+  "name": "reptily/sql-to-laravel-builder",
   "description": "SQL to Laravel Query Builder",
   "keywords": [
     "sql-to-builder",
@@ -9,9 +9,13 @@
     "laravel-database",
     "active-record"
   ],
-  "homepage": "https://github.com/rexshijaku/sql-to-laravel-builder",
+  "homepage": "https://github.com/reptily/sql-to-laravel-builder",
   "license": "MIT",
   "authors": [
+    {
+      "name": "Aristarkhov Vladimir",
+      "email": "reptily@mail.ru"
+    },
     {
       "name": "Rexhep Shijaku",
       "email": "rexhepshijaku@gmail.com",
@@ -26,12 +30,15 @@
   },
   "autoload": {
     "psr-4": {
-      "RexShijaku\\SQLToLaravelBuilder\\": "src/"
+      "Reptily\\SQLToLaravelBuilder\\": "src/"
     }
   },
   "autoload-dev" : {
     "psr-4" : {
-      "RexShijaku\\SQLToLaravelBuilder\\Test\\" : "tests/cases/"
+      "Reptily\\SQLToLaravelBuilder\\Test\\" : "tests/cases/"
     }
+  },
+  "scripts": {
+    "test": "vendor/phpunit/phpunit/phpunit tests/cases"
   }
 }

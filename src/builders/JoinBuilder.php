@@ -1,6 +1,6 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\builders;
+namespace Reptily\SQLToLaravelBuilder\builders;
 
 /**
  * This class constructs and produces following Query Builder methods :
@@ -16,7 +16,7 @@ namespace RexShijaku\SQLToLaravelBuilder\builders;
 class JoinBuilder extends AbstractBuilder implements Builder
 {
 
-    public function build(array $parts, array &$skipBag = array())
+    public function build(array $parts, array &$skipBag = [])
     {
         $qb = '';
 
@@ -57,7 +57,7 @@ class JoinBuilder extends AbstractBuilder implements Builder
                         } else {
                             // no raw found and not between
                             $operators = implode(' ', $onClause['operators']);
-                            $fnParts = $onClause['sep'] == 'and' ? array('on') : array('or', 'on');
+                            $fnParts = $onClause['sep'] == 'and' ? ['on'] : ['or', 'on'];
 
                             $qb .= '->';
                             $qb .= $this->fnMerger($fnParts);

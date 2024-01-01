@@ -1,6 +1,6 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\builders;
+namespace Reptily\SQLToLaravelBuilder\builders;
 
 /**
  * This class constructs and produces following Query Builder methods :
@@ -13,7 +13,7 @@ namespace RexShijaku\SQLToLaravelBuilder\builders;
  */
 class LimitBuilder extends AbstractBuilder implements Builder
 {
-    public function build(array $parts, array &$skip_bag = array())
+    public function build(array $parts, array &$skipBag = [])
     {
         $queryVal = '';
 

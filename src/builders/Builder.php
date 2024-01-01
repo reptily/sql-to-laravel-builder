@@ -1,6 +1,6 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\builders;
+namespace Reptily\SQLToLaravelBuilder\builders;
 
 /**
  *  Builder.php
@@ -21,7 +21,7 @@ interface Builder
      * @param array $skipBag
      * @return A string, which contains a part of Query Builder.
      */
-    public function build(array $parts, array &$skipBag = array());
+    public function build(array $parts, array &$skipBag = []);
 }
 
 

@@ -1,16 +1,16 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\utils;
+namespace Reptily\SQLToLaravelBuilder\utils;
 
-class CriterionTypes
+interface CriterionTypes
 {
-    const Against = 'against';
-    const Between = 'between';
-    const Comparison = 'comparison';
-    const Group = 'group';
-    const InField = 'in_field';
-    const InFieldValue = 'in_field_value';
-    const Is = 'is';
-    const Like = 'like';
-    const Function = 'fn';
+    public const AGAINST = 'against';
+    public const BETWEEN = 'between';
+    public const COMPARISON = 'comparison';
+    public const GROUP = 'group';
+    public const IN_FIELD = 'in_field';
+    public const IN_FIELD_VALUE = 'in_field_value';
+    public const IS = 'is';
+    public const LIKE = 'like';
+    public const FN = 'fn';
 }

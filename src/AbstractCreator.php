@@ -1,7 +1,7 @@
 <?php
 
 
-namespace RexShijaku\SQLToLaravelBuilder;
+namespace Reptily\SQLToLaravelBuilder;
 
 /**
  * This class provides additional functionality for the Creator class.
@@ -13,9 +13,8 @@ class AbstractCreator
 {
     public $qb;
     public $lastly;
-    public $qb_closed;
-    public $in_union = false;
-
+    public $qbClosed;
+    public bool $inUnion = false;
 
     function isSingleTable($parsed)
     {
@@ -31,5 +30,4 @@ class AbstractCreator
         $this->qb = '';
         $this->lastly = '';
     }
-
 }

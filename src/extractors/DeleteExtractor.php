@@ -1,6 +1,6 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\extractors;
+namespace Reptily\SQLToLaravelBuilder\extractors;
 
 /**
  * This class extracts and compiles SQL query parts for the following Query Builder methods :
@@ -13,9 +13,9 @@ namespace RexShijaku\SQLToLaravelBuilder\extractors;
 class DeleteExtractor extends AbstractExtractor implements Extractor
 {
 
-    public function extract(array $value, array $parsed = array())
+    public function extract(array $value, array $parsed = [])
     {
-        return array();
+        return [];
     }
 }
 

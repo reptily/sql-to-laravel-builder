@@ -1,6 +1,6 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\builders;
+namespace Reptily\SQLToLaravelBuilder\builders;
 
 /**
  * This class constructs and produces following Query Builder methods :
@@ -13,7 +13,7 @@ namespace RexShijaku\SQLToLaravelBuilder\builders;
  */
 class GroupByBuilder extends AbstractBuilder implements Builder
 {
-    public function build(array $parts, array &$skipBag = array())
+    public function build(array $parts, array &$skipBag = [])
     {
         $qb = '';
         $partsLen = count($parts['parts']);
@@ -24,13 +24,14 @@ class GroupByBuilder extends AbstractBuilder implements Builder
         $fn = !$parts['is_raw'] ? 'groupBy' : 'groupByRaw';
 
         $inner = '';
-        if ($partsLen == 1)
+        if ($partsLen == 1) {
             $inner .= $this->quote($parts['parts'][0]);
-        else if ($partsLen > 1) {
-            if ($parts['is_raw'])
+        } else if ($partsLen > 1) {
+            if ($parts['is_raw']) {
                 $inner = $this->quote(implode(', ', $parts['parts']));
-            else
+            } else {
                 $inner = '[' . implode(", ", array_map(array($this, 'quote'), $parts['parts'])) . ']';
+            }
         }
 
         $qb .= "->" . $fn . '(' . $inner . ')';

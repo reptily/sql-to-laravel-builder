@@ -1,6 +1,6 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\extractors;
+namespace Reptily\SQLToLaravelBuilder\extractors;
 /**
  * This class extracts and compiles SQL query parts for the following Query Builder methods :
  *
@@ -12,12 +12,14 @@ namespace RexShijaku\SQLToLaravelBuilder\extractors;
  */
 class OrderExtractor extends AbstractExtractor implements Extractor
 {
-    public function extract(array $value, array $parsed = array())
+    public function extract(array $value, array $parsed = [])
     {
-        $this->getExpressionParts($value, $parts_temp);
-        $parts = array();
-        foreach ($value as $k => $val)
-            $parts[] = array('field' => $parts_temp[$k], 'dir' => $val['direction'], 'type' => 'normal', 'raw' => $this->isRaw($val));
+        $this->getExpressionParts($value, $partsTemp);
+        $parts = [];
+        foreach ($value as $k => $val) {
+            $parts[] = ['field' => $partsTemp[$k], 'dir' => $val['direction'], 'type' => 'normal', 'raw' => $this->isRaw($val)];
+        }
+
         return $parts;
     }
 }

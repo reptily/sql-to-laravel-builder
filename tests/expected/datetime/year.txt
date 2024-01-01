@@ -1,1 +1,1 @@
-DB::table('members')->whereYear('created_at','=',1991)->get();
+DB::table('members')->whereYear('created_at', '=', 1991)->get();

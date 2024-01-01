@@ -1,10 +1,6 @@
 # Marwan - SQL To Laravel Builder
 SQL to Laravel Query Builder, A Converter written in PHP
 
-## Support
-
-<a href="https://www.buymeacoffee.com/rexshijaku" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="50" width="180"></a>
-
 ### Features
 - Converts SQL Queries to Laravel Query Builder.
 - Assists on building queries as instructed in Laravel Documentation. 
@@ -13,11 +9,6 @@ SQL to Laravel Query Builder, A Converter written in PHP
 ### Supports 
 Laravel 8
 
-### Demo
-
-##### Online demo
-Live demo and free usage is available <a href='http://152.70.176.144/sql-to-laravel-builder/'>here</a>.
-
 ### Get Started
 ##### Install by manual download: 
 Download the repository and install required packages by composer.json :
@@ -25,7 +16,7 @@ Download the repository and install required packages by composer.json :
 ##### Packagist
 You can also install it from packagist by running the following command :
 ```html
-composer require rexshijaku/sql-to-laravel-builder
+composer require reptily/sql-to-laravel-builder
 ```
 
 ### Usage

@@ -1,6 +1,6 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\extractors;
+namespace Reptily\SQLToLaravelBuilder\extractors;
 /**
  * This class extracts and compiles SQL query parts for the following Query Builder methods :
  *
@@ -12,17 +12,19 @@ namespace RexShijaku\SQLToLaravelBuilder\extractors;
  */
 class GroupByExtractor extends AbstractExtractor implements Extractor
 {
-    public function extract(array $value, array $parsed = array())
+    public function extract(array $value, array $parsed = [])
     {
-        $parts = array(); // columns
-        $is_raw = false;
-        foreach ($value as $k => $val) {
-            $parts_tmp = array();
-            $this->getExpressionParts(array($val), $parts_tmp); // expression parts since it can be anything! such as fn, subquery etc.
-            $parts[] = $this->mergeExpressionParts($parts_tmp);
-            if ($this->isRaw($val))
-                $is_raw = true;
+        $parts = []; // columns
+        $isRaw = false;
+        foreach ($value as $val) {
+            $partsTmp = [];
+            $this->getExpressionParts([$val], $partsTmp); // expression parts since it can be anything! such as fn, subquery etc.
+            $parts[] = $this->mergeExpressionParts($partsTmp);
+            if ($this->isRaw($val)) {
+                $isRaw = true;
+            }
         }
-        return array('parts' => $parts, 'is_raw' => $is_raw);
+
+        return ['parts' => $parts, 'is_raw' => $isRaw];
     }
 }

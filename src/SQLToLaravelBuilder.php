@@ -1,14 +1,13 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder;
+namespace Reptily\SQLToLaravelBuilder;
 
 use PHPSQLParser\PHPSQLParser;
-
 
 class SQLToLaravelBuilder
 {
     private $sql;
-    private $creator;
+    private Creator $creator;
     private $options;
     private $temp;
 
@@ -26,17 +25,17 @@ class SQLToLaravelBuilder
     {
         $this->sql = $sql;
         try {
-
             $this->options->set();
             $this->unionHandler();
             $parser = new PHPSQLParser($this->sql);
-            $parsed = is_array($parser->parsed) ? $parser->parsed : array();
-            $this->creator = new Creator($this, $this->options->get());
+            $parsed = is_array($parser->parsed) ? $parser->parsed : [];
+            $this->creator = new Creator($this->options->get());
+
             return $this->parse($parsed);
         } catch (\Exception $exception) {
-
             if (isset($this->creator)) {
                 $this->creator->resetQ();
+
                 return $exception->getMessage() .
                     ' Alternative result : ' . $this->creator->getQuery($this->sql, true);
             } else {
@@ -52,8 +51,9 @@ class SQLToLaravelBuilder
 
         foreach ($parsed as $k => $value) {
 
-            if (in_array($k, $this->creator->skip_bag))
+            if (in_array($k, $this->creator->skipBag)) {
                 continue;
+            }
 
             switch ($k) {
                 case 'SELECT':
@@ -78,33 +78,33 @@ class SQLToLaravelBuilder
                     $this->creator->order($value);
                     break;
                 case 'INSERT':
-                    $skip_bag[] = 'VALUES';
                     $this->creator->insert($value, $parsed);
-                    $this->creator->qb_closed = true;
+                    $this->creator->qbClosed = true;
                     break;
                 case 'REPLACE':
                     throw new \Exception('REPLACE for this version is not supported! ');
                 case 'UPDATE':
                     $this->creator->update($value, $parsed);
-                    $this->creator->qb_closed = true;
+                    $this->creator->qbClosed = true;
                     break;
                 case "DELETE":
-                    $this->creator->qb_closed = true;
+                    $this->creator->qbClosed = true;
                     $this->creator->delete($parsed);
                     break;
                 case "UNION":
-                    $parts = array();
-                    $this->creator->in_union = true;
+                    $parts = [];
+                    $this->creator->inUnion = true;
                     foreach ($value as $key => $q) {
                         $this->creator->resetQ();
-                        $single_parts = $this->parse($q);
+                        $singleParts = $this->parse($q);
 
-                        $part = array('str' => $single_parts);
-                        if ($key > 0)
+                        $part = ['str' => $singleParts];
+                        if ($key > 0) {
                             $part['is_all'] = $this->temp[$key];
+                        }
                         $parts[] = $part;
                     }
-                    $this->creator->in_union = false;
+                    $this->creator->inUnion = false;
                     $this->creator->union($parts);
                     return $this->creator->qb;
                 default:
@@ -119,13 +119,14 @@ class SQLToLaravelBuilder
      * Pulls tables out which are in UPDATE and INSERT statements in order to provide a more consistent and simple way to parser
      * @param $parsed
      */
-    private function ejector(&$parsed)
+    private function ejector(&$parsed): void
     {
         foreach ($parsed as $k => &$values) {
             if ($k == 'UPDATE' || $k == 'INSERT') {
                 foreach ($values as $value) {
-                    if ($value['expr_type'] == 'table')
+                    if ($value['expr_type'] == 'table') {
                         $parsed['FROM'][] = $value;
+                    }
                 }
             }
         }

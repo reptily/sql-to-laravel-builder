@@ -1,6 +1,6 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\builders;
+namespace Reptily\SQLToLaravelBuilder\builders;
 
 /**
  * This class constructs and produces following Query Builder methods :
@@ -13,8 +13,7 @@ namespace RexShijaku\SQLToLaravelBuilder\builders;
  */
 class OrderBuilder extends AbstractBuilder implements Builder
 {
-
-    function build(array $parts, array &$skipBag = array())
+    function build(array $parts, array &$skipBag = [])
     {
         $q = '';
         $isRaw = false;
@@ -26,20 +25,26 @@ class OrderBuilder extends AbstractBuilder implements Builder
 
         if ($isRaw) {
             $inner = '';
-            foreach ($parts as $k => $f_v) {
-                if (!empty($inner))
+            foreach ($parts as $val) {
+                if (!empty($inner)) {
                     $inner .= ', ';
+                }
 
-                if ($f_v['type'] == 'fn')
-                    $inner .= ($f_v['dir']) . ' (' . ($f_v['field']) . ')';
-                else
-                    $inner .= ($f_v['field']) . ' ' . ($f_v['dir']);
+                if ($val['type'] == 'fn') {
+                    $inner .= ($val['dir']) . ' (' . ($val['field']) . ')';
+                } else {
+                    $inner .= ($val['field']) . ' ' . ($val['dir']);
+                }
             }
-
             $q .= '->orderByRaw(' . $this->quote($inner) . ')';
         } else {
-            foreach ($parts as $k => $f_v)
-                $q .= "->orderBy(" . $this->quote($f_v['field']) . ', ' . $this->quote($f_v['dir']) . ')';
+            foreach ($parts as $val) {
+                if (trim(mb_strtolower($this->quote($val['dir']))) == "'asc'") {
+                    $q .= "->orderBy(" . $this->quote($val['field']) . ')';
+                } else {
+                    $q .= "->orderByDesc(" . $this->quote($val['field']) . ')';
+                }
+            }
         }
 
         return $q;

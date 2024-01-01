@@ -1,10 +1,10 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\utils;
+namespace Reptily\SQLToLaravelBuilder\utils;
 
-class SelectQueryTypes
+interface SelectQueryTypes
 {
-    const Aggregate = 'aggregate';
-    const CountATable = 'count_a_table';
-    const Other = 'other';
+    public const AGGREGATE = 'aggregate';
+    public const COUNT_A_TABLE = 'count_a_table';
+    public const OTHER = 'other';
 }

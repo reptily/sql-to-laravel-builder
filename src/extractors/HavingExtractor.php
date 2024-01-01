@@ -1,8 +1,8 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\extractors;
+namespace Reptily\SQLToLaravelBuilder\extractors;
 
-use RexShijaku\SQLToLaravelBuilder\utils\CriterionContext;
+use Reptily\SQLToLaravelBuilder\utils\CriterionContext;
 
 /**
  * This class extracts and compiles SQL query parts for the following Query Builder methods :
@@ -18,10 +18,11 @@ use RexShijaku\SQLToLaravelBuilder\utils\CriterionContext;
  */
 class HavingExtractor extends AbstractExtractor implements Extractor
 {
-    public function extract(array $value, array $parsed = array())
+    public function extract(array $value, array $parsed = [])
     {
         $criterion = new CriterionExtractor($this->options);
-        $criterion->getCriteriaParts($value, $parts, CriterionContext::Having);
+        $criterion->getCriteriaParts($value, $parts, CriterionContext::HAVING);
+
         return $parts;
     }
 }

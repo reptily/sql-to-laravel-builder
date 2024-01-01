@@ -1,8 +1,8 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\builders;
+namespace Reptily\SQLToLaravelBuilder\builders;
 
-use RexShijaku\SQLToLaravelBuilder\utils\CriterionTypes;
+use Reptily\SQLToLaravelBuilder\utils\CriterionTypes;
 
 /**
  * This class constructs and produces following Query Builder methods :
@@ -18,15 +18,15 @@ use RexShijaku\SQLToLaravelBuilder\utils\CriterionTypes;
  */
 class HavingBuilder extends AbstractBuilder implements Builder
 {
-    public function build(array $parts, array &$skipBag = array())
+    public function build(array $parts, array &$skipBag = [])
     {
         $queryVal = '';
         $groupVal = '';
-        $in_group = false;
+        $inGroup = false;
 
         foreach ($parts as $part) {
 
-            if ($in_group && $part['type'] != 'group') {
+            if ($inGroup && $part['type'] != 'group') {
                 if (!empty($groupVal))
                     $groupVal .= ' ' . $part['sep'] . ' ';
 
@@ -41,37 +41,37 @@ class HavingBuilder extends AbstractBuilder implements Builder
             }
 
             switch ($part['type']) {
-                case CriterionTypes::Group:
-                    $in_group = $this->buildGroup($part, $groupVal, $queryVal);
+                case CriterionTypes::GROUP:
+                    $inGroup = $this->buildGroup($part, $groupVal, $queryVal);
                     break;
-                case CriterionTypes::Comparison:
-                case CriterionTypes::Is:
-                case CriterionTypes::Like:
+                case CriterionTypes::COMPARISON:
+                case CriterionTypes::IS:
+                case CriterionTypes::LIKE:
                     $op = implode(' ', $part['operators']);
                     $part['value'] = $this->getValue($part['value']) == 'null' ? 'null' : $part['value'];
                     if (in_array('is', $part['operators']) || $part['raw_field'] || $part['raw_value']) {
                         $fn = $this->getValue($part['sep']) == 'or' ? 'orHavingRaw' : 'havingRaw';
                         if ($part['value'] !== 'null')
-                            $inner = $this->quote($part['field'] . ' ' . $op . ' ' . '?') . ',' . '[' . $this->wrapValue($part['value']) . ']';
+                            $inner = $this->quote($part['field'] . ' ' . $op . ' ' . '?') . ', ' . '[' . $this->wrapValue($part['value']) . ']';
                         else
                             $inner = $this->quote($part['field'] . ' ' . $op . ' ' . $this->wrapValue($part['value']));
                     } else {
                         $fn = $this->getValue($part['sep']) == 'or' ? 'orHaving' : 'having';
-                        $inner = $this->quote($part['field']) . ',' . $this->quote($op) . ',' . $this->wrapValue($part['value']);
+                        $inner = $this->quote($part['field']) . ', ' . $this->quote($op) . ', ' . $this->wrapValue($part['value']);
                     }
                     $queryVal .= '->' . $fn . '(' . $inner . ')';
                     break;
-                case CriterionTypes::InFieldValue:
-                case CriterionTypes::InField: // for sub queries
+                case CriterionTypes::IN_FIELD_VALUE:
+                case CriterionTypes::IN_FIELD: // for sub queries
                     $fn = $this->getValue($part['sep']) == 'or' ? 'orHavingRaw' : 'havingRaw';
                     $inner = $part['field'] . ' ' . strtoupper(implode(' ', $part['operators'])) . ' ' . $part['value'];
                     $queryVal .= '->' . $fn . '(' . $this->quote($inner) . ')';
                     break;
-                case CriterionTypes::Between:
+                case CriterionTypes::BETWEEN:
                     $queryVal .= $this->buildBetween($part);
                     break;
 
-                case CriterionTypes::Against:
+                case CriterionTypes::AGAINST:
                     $fn = $this->getValue($part['sep']) == 'or' ? 'orWhereRaw' : 'whereRaw';
                     $queryVal .= '->' . $fn . '(' . $this->quote($part['field'] . ' AGAINST ' . $part['value']) . ')';
                     break;
@@ -107,7 +107,7 @@ class HavingBuilder extends AbstractBuilder implements Builder
 
     private function buildGroup($part, &$groupVal, &$queryVal)
     {
-        if (in_array($part['se'], array('start', 'end'))) {
+        if (in_array($part['se'], ['start', 'end'])) {
 
             if ($part['se'] == 'start'){
                 return true;

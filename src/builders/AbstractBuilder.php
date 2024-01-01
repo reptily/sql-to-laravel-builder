@@ -1,6 +1,6 @@
 <?php
 
-namespace RexShijaku\SQLToLaravelBuilder\builders;
+namespace Reptily\SQLToLaravelBuilder\builders;
 
 /**
  * This class provides common functionality for all Builder classes.
@@ -28,7 +28,7 @@ abstract class AbstractBuilder
      * @param $val
      * @return string
      */
-    function getValue($val)
+    function getValue($val): string
     {
         return strtolower(trim($val));
     }
@@ -38,11 +38,12 @@ abstract class AbstractBuilder
      * @param $str
      * @return string
      */
-    function quote($str)
+    function quote($str): string
     {
         $str = trim($str, '\"');
         $str = trim($str, '\'');
         $str = addslashes($str);
+
         return "'" . $str . "'";
     }
 
@@ -52,13 +53,15 @@ abstract class AbstractBuilder
      * @param $str
      * @return int|string
      */
-    function wrapValue($str)
+    function wrapValue($str): mixed
     {
-        if (is_numeric($str))
+        if (is_numeric($str)) {
             return $str;
+        }
 
-        if ($this->getValue($str) == 'null')
+        if ($this->getValue($str) == 'null') {
             return 'null';
+        }
 
         return $this->quote($str);
     }
@@ -70,28 +73,31 @@ abstract class AbstractBuilder
      * @param $parts
      * @return false|string
      */
-    function arrayify($parts)
+    function arrayify($parts): bool|string
     {
-        $disposable = array('=' => '');
+        $disposable = ['=' => ''];
         $keys = array_keys($disposable);
 
-        $all = array();
+        $all = [];
         foreach ($parts['fields'] as $k => $field) {
             $operator = $parts['operators'][$k];
-            if (in_array($this->getValue($operator), $keys))
+            if (in_array($this->getValue($operator), $keys)) {
                 $operator = $disposable[$this->getValue($operator)];
+            }
 
             $value = $parts['values'][$k];
-            if (!empty($operator))
+            if (!empty($operator)) {
                 $all[] = '[' . $this->quote($field) . ', ' . $this->quote(strtoupper($operator)) . ', ' . $this->wrapValue($value) . ']';
-            else
+            } else {
                 $all[] = '[' . $this->quote($field) . ', ' . $this->wrapValue($value) . ']';
+            }
         }
 
-        if (!empty($all))
+        if (!empty($all)) {
             return "[" . implode(', ', $all) . ']';
-        else
+        } else {
             return false;
+        }
     }
 
     /**
@@ -101,12 +107,15 @@ abstract class AbstractBuilder
      * @param $tokens
      * @return string
      */
-    function fnMerger($tokens)
+    function fnMerger($tokens): string
     {
         $separator = '';
-        for ($i = 0; $i < count($tokens); $i++)
-            if ($i > 0)
+        for ($i = 0; $i < count($tokens); $i++) {
+            if ($i > 0) {
                 $tokens[$i] = ucfirst($tokens[$i]);
+            }
+        }
+
         return implode($separator, $tokens);
     }
 
@@ -115,12 +124,18 @@ abstract class AbstractBuilder
      * @param $value
      * @return string
      */
-    protected function unBracket($value)
+    protected function unBracket($value): string
     {
-        if ($value[0] == '(')
+        if ($value[0] == '(') {
             $value = substr($value, 1);
-        if ($value[strlen($value) - 1] == ')')
+        }
+
+        if ($value[strlen($value) - 1] == ')') {
             $value = substr($value, 0, strlen($value) - 1);
+        }
+
+        $value = preg_replace('/,(\w|\W)/', ', $1', $value);
+
         return $value;
     }
 
@@ -131,9 +146,10 @@ abstract class AbstractBuilder
      * @param bool $isRaw
      * @return int|string
      */
-    protected function buildRawable($val, $isRaw = false)
+    protected function buildRawable($val, bool $isRaw = false): int|string
     {
         $val = $this->wrapValue($val);
+
         return $isRaw ? $this->options['facade'] . 'raw(' . $val . ')' : $val;
     }
 }
